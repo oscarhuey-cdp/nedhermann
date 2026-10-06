@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Teoría de Ned Herrmann aplicada a Ventas</title>
+<style>
+  :root{
+    --azul:#1e3a8a;
+    --azul-claro:#3b82f6;
+    --naranja:#f97316;
+    --gris:#f3f4f6;
+    --texto:#1f2937;
+    --verde:#10b981;
+    --rojo:#ef4444;
+    --amarillo:#eab308;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{
+    font-family:'Segoe UI',system-ui,-apple-system,sans-serif;
+    background:linear-gradient(135deg,#0f172a,#312e81);
+    color:var(--texto);
+    min-height:100vh;
+    padding:20px;
+  }
+  header{
+    text-align:center;
+    color:#fff;
+    margin-bottom:25px;
+  }
+  header h1{font-size:2rem;margin-bottom:8px;}
+  header p{opacity:.85;font-size:.95rem;}
+
+  .tabs{
+    max-width:1100px;
+    margin:0 auto;
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+    justify-content:center;
+  }
+  .tab-btn{
+    background:rgba(255,255,255,.15);
+    color:#fff;
+    border:2px solid transparent;
+    padding:12px 22px;
+    border-radius:12px 12px 0 0;
+    cursor:pointer;
+    font-size:.95rem;
+    font-weight:600;
+    transition:.25s;
+    backdrop-filter:blur(6px);
+    position:relative;
+  }
+  .tab-btn:hover{background:rgba(255,255,255,.28);}
+  .tab-btn.active{
+    background:#fff;
+    color:var(--azul);
+    border-color:#fff;
+  }
+  .tab-btn.visitada::after{
+    content:"✓";
+    position:absolute;
+    top:4px;
+    right:6px;
+    font-size:.7rem;
+    color:#10b981;
+    font-weight:800;
+  }
+  .tab-btn.active.visitada::after{color:var(--azul);}
+
+  .panel{
+    max-width:1100px;
+    margin:0 auto;
+    background:#fff;
+    border-radius:0 0 16px 16px;
+    padding:35px;
+    display:none;
+    box-shadow:0 20px 50px rgba(0,0,0,.35);
+    animation:fade .35s ease;
+  }
+  .panel.active{display:block;}
+  @keyframes fade{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+
+  .slide{display:none;animation:fade .3s ease;}
+  .slide.active{display:block;}
+  .slide h2{
+    color:var(--azul);
+    font-size:1.5rem;
+    border-bottom:3px solid var(--naranja);
+    padding-bottom:10px;
+    margin-bottom:18px;
+  }
+  .slide h3{color:var(--azul-claro);margin:20px 0 10px;font-size:1.15rem;}
+  .slide p, .slide li{line-height:1.65;font-size:1rem;margin-bottom:8px;}
+  .slide ul{padding-left:24px;margin-bottom:14px;}
+
+  .badge{
+    display:inline-block;
+    background:var(--naranja);
+    color:#fff;
+    font-size:.75rem;
+    padding:4px 12px;
+    border-radius:20px;
+    margin-bottom:12px;
+    font-weight:700;
+    letter-spacing:.5px;
+  }
+  .badge.azul{background:var(--azul-claro);}
+  .badge.verde{background:var(--verde);}
+  .badge.rojo{background:var(--rojo);}
+  .badge.amarillo{background:var(--amarillo);color:#000;}
+
+  .nav-slides{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-top:28px;
+    padding-top:18px;
+    border-top:2px solid var(--gris);
+    gap:10px;
+    flex-wrap:wrap;
+  }
+  .nav-slides button{
+    background:var(--azul);
+    color:#fff;
+    border:none;
+    padding:10px 22px;
+    border-radius:10px;
+    cursor:pointer;
+    font-weight:600;
+    transition:.2s;
+    font-size:.9rem;
+  }
+  .nav-slides button:hover:not(:disabled){background:var(--azul-claro);transform:translateY(-1px);}
+  .nav-slides button:disabled{opacity:.35;cursor:not-allowed;}
+  .nav-slides button.cta{background:var(--verde);}
+  .nav-slides button.cta:hover{background:#059669;}
+  .slide-counter{font-weight:700;color:var(--azul);}
+
+  table{width:100%;border-collapse:collapse;margin:14px 0;font-size:.92rem;}
+  th{background:var(--azul);color:#fff;padding:10px;text-align:left;}
+  td{padding:10px;border-bottom:1px solid #e5e7eb;vertical-align:top;}
+  tr:nth-child(even) td{background:var(--gris);}
+
+  .box{
+    background:var(--gris);
+    border-left:5px solid var(--azul-claro);
+    padding:16px 20px;
+    border-radius:8px;
+    margin:14px 0;
+  }
+  .box.naranja{border-left-color:var(--naranja);background:#fff7ed;}
+  .box.verde{border-left-color:var(--verde);background:#ecfdf5;}
+  .box.rojo{border-left-color:var(--rojo);background:#fef2f2;}
+  .box.amarillo{border-left-color:var(--amarillo);background:#fefce8;}
+
+  .ejercicio{
+    background:#fff;
+    border:2px solid #e5e7eb;
+    border-radius:12px;
+    padding:20px;
+    margin:16px 0;
+  }
+  .ejercicio h4{color:var(--azul);margin-bottom:10px;}
+  .ejercicio input, .ejercicio textarea{
+    width:100%;
+    padding:10px;
+    border:2px solid #d1d5db;
+    border-radius:8px;
+    font-size:.92rem;
+    font-family:inherit;
+    margin-bottom:10px;
+    resize:vertical;
+  }
+  .ejercicio input:focus, .ejercicio textarea:focus{
+    outline:none;
+    border-color:var(--azul-claro);
+  }
+  .ejercicio label{font-weight:600;font-size:.88rem;display:block;margin-bottom:4px;color:#374151;}
+
+  .btn{
+    background:var(--verde);
+    color:#fff;
+    border:none;
+    padding:10px 20px;
+    border-radius:8px;
+    cursor:pointer;
+    font-weight:600;
+    transition:.2s;
+    font-size:.9rem;
+  }
+  .btn:hover{filter:brightness(1.1);transform:translateY(-1px);}
+  .btn.naranja{background:var(--naranja);}
+  .btn.azul{background:var(--azul-claro);}
+  .btn.rojo{background:var(--rojo);}
+
+  .svg-container{display:flex;justify-content:center;margin:18px 0;}
+  .svg-container svg{max-width:100%;height:auto;}
+
+  .icon-row{display:flex;gap:18px;flex-wrap:wrap;justify-content:center;margin:18px 0;}
+  .icon-card{
+    flex:1 1 160px;
+    max-width:200px;
+    text-align:center;
+    padding:18px 12px;
+    background:var(--gris);
+    border-radius:12px;
+    transition:.25s;
+  }
+  .icon-card:hover{transform:translateY(-4px);box-shadow:0 8px 20px rgba(0,0,0,.1);}
+  .icon-card svg{width:52px;height:52px;margin-bottom:8px;}
+  .icon-card p{font-size:.85rem;font-weight:600;color:var(--azul);}
+
+  .respuesta{
+    background:#ecfdf5;
+    border-left:5px solid var(--verde);
+    padding:16px 20px;
+    border-radius:8px;
+    margin:14px 0;
+  }
+  .respuesta h4{color:#047857;margin-bottom:8px;font-size:1rem;}
+  .respuesta p, .respuesta li{font-size:.92rem;line-height:1.6;}
+  .respuesta ul{padding-left:20px;}
+
+  .entregable{
+    background:linear-gradient(135deg,#eff6ff,#dbeafe);
+    border:2px dashed var(--azul-claro);
+    border-radius:14px;
+    padding:24px;
+    margin:18px 0;
+  }
+  .entregable h3{color:var(--azul);margin-bottom:12px;}
+
+  a{color:var(--azul-claro);text-decoration:none;font-weight:600;}
+  a:hover{text-decoration:underline;}
+
+  .toast{
+    position:fixed;
+    bottom:24px;
+    left:50%;
+    transform:translateX(-50%) translateY(80px);
+    background:var(--verde);
+    color:#fff;
+    padding:14px 28px;
+    border-radius:10px;
+    font-weight:600;
+    box-shadow:0 10px 30px rgba(0,0,0,.3);
+    opacity:0;
+    transition:.35s;
+    z-index:9999;
+    pointer-events:none;
+  }
+  .toast.visible{opacity:1;transform:translateX(-50%) translateY(0);}
+
+  footer{
+    text-align:center;
+    color:rgba(255,255,255,.6);
+    margin-top:30px;
+    font-size:.8rem;
+  }
+
+  @media(max-width:600px){
+    .panel{padding:20px;}
+    header h1{font-size:1.4rem;}
+    .tab-btn{padding:9px 14px;font-size:.82rem;}
+    .nav-slides{justify-content:center;}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🧠 Teoría de Ned Herrmann aplicada a Ventas</h1>
+  <p>Identificación del tipo de cliente según los cuatro cuadrantes del cerebro</p>
+</header>
+
+<div class="tabs">
+  <button class="tab-btn active visitada" onclick="cambiarTab('diapositivas', this)">📊 Diapositivas</button>
+  <button class="tab-btn" onclick="cambiarTab('ejercicios', this)">✏️ Ejercicios</button>
+  <button class="tab-btn" onclick="cambiarTab('respuestas', this)">✅ Respuestas Esperadas</button>
+  <button class="tab-btn" onclick="cambiarTab('entregable', this)">📦 Entregable</button>
+  <button class="tab-btn" onclick="cambiarTab('recursos', this)">📚 Recursos</button>
+</div>
+
+<!-- ============================================================ -->
+<!-- PANEL 1: DIAPOSITIVAS                                        -->
+<!-- ============================================================ -->
+<div id="diapositivas" class="panel active">
+
+  <!-- SLIDE 1 -->
+  <div class="slide active">
+    <span class="badge">Diapositiva 1 · Introducción</span>
+    <h2>¿Por qué tu cliente no te entiende?</h2>
+
+    <div class="svg-container">
+      <svg viewBox="0 0 420 240" width="420" height="240">
+        <circle cx="210" cy="120" r="40" fill="#1e3a8a"/>
+        <text x="210" y="116" text-anchor="middle" fill="#fff" font-size="11" font-weight="bold">CEREBRO</text>
+        <text x="210" y="132" text-anchor="middle" fill="#fff" font-size="11" font-weight="bold">TOTAL</text>
+        <rect x="20" y="20" width="120" height="90" rx="10" fill="#3b82f6" opacity="0.9"/>
+        <text x="80" y="55" text-anchor="middle" fill="#fff" font-size="15" font-weight="bold">A · AZUL</text>
+        <text x="80" y="78" text-anchor="middle" fill="#fff" font-size="10">Lógico / Analítico</text>
+        <rect x="20" y="130" width="120" height="90" rx="10" fill="#10b981" opacity="0.9"/>
+        <text x="80" y="165" text-anchor="middle" fill="#fff" font-size="15" font-weight="bold">B · VERDE</text>
+        <text x="80" y="188" text-anchor="middle" fill="#fff" font-size="10">Organizado / Detalle</text>
+        <rect x="280" y="130" width="120" height="90" rx="10" fill="#ef4444" opacity="0.9"/>
+        <text x="340" y="165" text-anchor="middle" fill="#fff" font-size="15" font-weight="bold">C · ROJO</text>
+        <text x="340" y="188" text-anchor="middle" fill="#fff" font-size="10">Emocional / Relación</text>
+        <rect x="280" y="20" width="120" height="90" rx="10" fill="#eab308" opacity="0.95"/>
+        <text x="340" y="55" text-anchor="middle" fill="#000" font-size="15" font-weight="bold">D · AMARILLO</text>
+        <text x="340" y="78" text-anchor="middle" fill="#000" font-size="10">Intuitivo / Innovador</text>
+      </svg>
+    </div>
+
+    <div class="box naranja">
+      <strong>Pregunta inicial:</strong> ¿Alguna vez has hablado con un cliente que parece "no escuchar"? El problema no es el producto, es el <em>lenguaje mental</em> que usa.
+    </div>
+
+    <h3>En esta clase aprenderás:</h3>
+    <ul>
+      <li>El <strong>modelo del cerebro total</strong> de Ned Herrmann</li>
+      <li>Cómo identificar los <strong>4 tipos de clientes</strong> según su cuadrante dominante</li>
+      <li>Qué <strong>lenguaje de venta</strong> usar con cada tipo</li>
+      <li>Cómo "traducir" tu propuesta al idioma mental del cliente</li>
+    </ul>
+  </div>
+
+  <!-- SLIDE 2 -->
+  <div class="slide">
+    <span class="badge azul">Diapositiva 2 · Modelo</span>
+    <h2>Los Cuatro Cuadrantes del Cerebro Total</h2>
+
+    <p>Ned Herrmann, investigador de General Electric en los años 70, propuso que el pensamiento humano se organiza en <strong>cuatro preferencias</strong>. No son tipos rígidos: cada persona tiene una combinación dominante.</p>
+
+    <table>
+      <tr><th>Cuadrante</th><th>Color</th><th>Características</th><th>El cliente típico...</th></tr>
+      <tr><td><strong>A</strong></td><td>Azul</td><td>Lógica, análisis, hechos</td><td>Pide datos, pruebas, comparativas</td></tr>
+      <tr><td><strong>B</strong></td><td>Verde</td><td>Planificación, orden, detalle</td><td>Pregunta por procesos, garantías, cláusulas</td></tr>
+      <tr><td><strong>C</strong></td><td>Rojo</td><td>Emoción, relaciones, empatía</td><td>Pregunta por confianza, testimonios, feeling</td></tr>
+      <tr><td><strong>D</strong></td><td>Amarillo</td><td>Intuición, innovación, visión global</td><td>Pregunta por novedad, futuro, posibilidades</td></tr>
+    </table>
+
+    <div class="box">
+      <strong>Idea clave:</strong> Nadie es "puro". La mayoría tiene dominancia doble o triple. Tu tarea es identificar cuál es el <em>cuadrante dominante del cliente en ese momento</em>.
+    </div>
+  </div>
+
+  <!-- SLIDE 3 -->
+  <div class="slide">
+    <span class="badge verde">Diapositiva 3 · Identificación</span>
+    <h2>¿Cómo identificar el tipo de cliente?</h2>
+
+    <div class="icon-row">
+      <div class="icon-card">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2"><path d="M3 3v18h18"/><path d="M7 14l4-4 4 4 5-6"/></svg>
+        <p><strong>A · Azul:</strong> "¿Cuál es el ROI? ¿Tienen datos?"</p>
+      </div>
+      <div class="icon-card">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+        <p><strong>B · Verde:</strong> "¿Cómo funciona paso a paso? ¿Quién responde?"</p>
+      </div>
+      <div class="icon-card">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 1 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        <p><strong>C · Rojo:</strong> "¿Quién más lo usa? ¿Cómo me van a tratar?"</p>
+      </div>
+      <div class="icon-card">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#eab308" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+        <p><strong>D · Amarillo:</strong> "¿Qué hay de nuevo? ¿Cómo me diferencia?"</p>
+      </div>
+    </div>
+
+    <h3>Señales no verbales</h3>
+    <ul>
+      <li><strong>A:</strong> Habla directo, sin rodeos. Su escritorio está ordenado y lleno de números.</li>
+      <li><strong>B:</strong> Toma notas, hace listas, repite lo que dijiste para confirmar.</li>
+      <li><strong>C:</strong> Sonríe, pregunta por ti, comparte historias personales.</li>
+      <li><strong>D:</strong> Interrumpe con ideas, se emociona, cambia de tema rápido.</li>
+    </ul>
+  </div>
+
+  <!-- SLIDE 4 -->
+  <div class="slide">
+    <span class="badge">Diapositiva 4 · Estrategias</span>
+    <h2>Qué decirle a cada tipo de cliente</h2>
+
+    <table>
+      <tr><th>Tipo</th><th>Habla su idioma con...</th><th>Evita...</th></tr>
+      <tr><td><strong>A · Azul</strong></td><td>Datos, ROI, comparativas, lógica</td><td>Historias emotivas, "yo siento que..."</td></tr>
+      <tr><td><strong>B · Verde</strong></td><td>Procesos, cronogramas, garantías, casos</td><td>Promesas vagas, "ya veremos"</td></tr>
+      <tr><td><strong>C · Rojo</strong></td><td>Testimonios, servicio, cercanía genuina</td><td>Datos fríos, presión agresiva</td></tr>
+      <tr><td><strong>D · Amarillo</strong></td><td>Visión, innovación, nuevas posibilidades</td><td>Exceso de detalle, cláusulas interminables</td></tr>
+    </table>
+
+    <div class="box amarillo">
+      <strong>Caso real (Purdue Pharma):</strong> La vendedora Janet Koch prefería un enfoque "rojo/verde" (historias, visuales). Al descubrir que la mayoría de sus médicos eran "azul/amarillo" (datos, visión), ajustó su discurso y <strong>sus ventas aumentaron</strong>.
+    </div>
+  </div>
+
+  <!-- SLIDE 5 -->
+  <div class="slide">
+    <span class="badge azul">Diapositiva 5 · Aplicación</span>
+    <h2>No cambies: traduce</h2>
+
+    <p>El objetivo no es convertirte en otro tipo de vendedor, sino <strong>traducir el mismo valor</strong> al idioma mental de tu cliente.</p>
+
+    <div class="box">
+      <strong>Mismo producto, 4 traducciones:</strong><br><br>
+      🟦 <strong>A:</strong> "Reduce costos operativos en un 15%, comprobado con datos de 200 empresas."<br><br>
+      🟩 <strong>B:</strong> "Implementación en 4 semanas con manual, capacitación y soporte 24/7."<br><br>
+      🟥 <strong>C:</strong> "Nuestros clientes dicen que por fin sienten que alguien los escucha."<br><br>
+      🟨 <strong>D:</strong> "Imagina a tu equipo dejando de hacer tareas repetitivas y dedicándose a innovar."
+    </div>
+
+    <div class="svg-container">
+      <svg viewBox="0 0 400 100" width="400" height="100">
+        <rect x="20" y="30" width="90" height="40" rx="8" fill="#1e3a8a"/>
+        <text x="65" y="55" text-anchor="middle" fill="#fff" font-size="11" font-weight="bold">TU VALOR</text>
+        <path d="M120 50 L160 50" stroke="#94a3b8" stroke-width="3"/>
+        <polygon points="160,44 172,50 160,56" fill="#94a3b8"/>
+        <rect x="180" y="10" width="70" height="30" rx="6" fill="#3b82f6"/>
+        <text x="215" y="30" text-anchor="middle" fill="#fff" font-size="10">A · Datos</text>
+        <rect x="180" y="55" width="70" height="30" rx="6" fill="#10b981"/>
+        <text x="215" y="75" text-anchor="middle" fill="#fff" font-size="10">B · Proceso</text>
+        <rect x="270" y="10" width="70" height="30" rx="6" fill="#ef4444"/>
+        <text x="305" y="30" text-anchor="middle" fill="#fff" font-size="10">C · Emoción</text>
+        <rect x="270" y="55" width="70" height="30" rx="6" fill="#eab308"/>
+        <text x="305" y="75" text-anchor="middle" fill="#000" font-size="10">D · Visión</text>
+      </svg>
+    </div>
+  </div>
+
+  <!-- SLIDE 6 -->
+  <div class="slide">
+    <span class="badge verde">Diapositiva 6 · Cierre</span>
+    <h2>Reflexión final</h2>
+
+    <div class="box verde">
+      La resistencia de un cliente no suele ser al producto. Es a <strong>tu lenguaje</strong>.
+    </div>
+
+    <p>La teoría de Herrmann no te pide cambiar tu personalidad, sino desarrollar <strong>flexibilidad mental</strong>: la capacidad de reconocer y hablar el idioma del otro.</p>
+
+    <p>Cuando un cliente "azul" te pide datos, no te está cuestionando: te está <em>dando la oportunidad</em> de demostrar solidez. Cuando un cliente "rojo" te habla de su familia, no pierde el tiempo: está construyendo la confianza que necesita para comprarte.</p>
+
+    <div class="box naranja">
+      <strong>Pregunta para llevar:</strong> Piensa en un cliente o persona con la que "no conectas". ¿Qué cuadrante crees que domina? ¿Cómo podrías traducir tu mensaje a su idioma?
+    </div>
+  </div>
+
+  <!-- Navegación -->
+  <div class="nav-slides">
+    <button id="prevBtn" onclick="moverSlide(-1)" disabled>← Anterior</button>
+    <span class="slide-counter" id="contador">1 / 6</span>
+    <button id="nextBtn" onclick="moverSlide(1)">Siguiente →</button>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- PANEL 2: EJERCICIOS                                          -->
+<!-- ============================================================ -->
+<div id="ejercicios" class="panel">
+  <h2 style="color:var(--azul);border-bottom:3px solid var(--naranja);padding-bottom:10px;margin-bottom:18px;">✏️ Ejercicios de Práctica</h2>
+
+  <div class="box">
+    <strong>Instrucciones:</strong> Completa cada ejercicio. Tus respuestas se guardan en el navegador al pulsar el botón. Luego revisa la pestaña <em>"Respuestas Esperadas"</em>.
+  </div>
+
+  <!-- EJERCICIO 1 -->
+  <div class="ejercicio">
+    <h4>Ejercicio 1 · Identifica el cuadrante dominante</h4>
+    <p>Escribe A, B, C o D según el cuadrante que predomina en cada cliente:</p>
+
+    <label>a) "Antes de decidir necesito ver el estudio comparativo con la competencia y el ROI proyectado."</label>
+    <input type="text" id="e1a" placeholder="Cuadrante...">
+
+    <label>b) "Me encanta que se tomen el tiempo de explicarme. Mi anterior proveedor nunca me llamaba."</label>
+    <input type="text" id="e1b" placeholder="Cuadrante...">
+
+    <label>c) "¿Cómo sería el cronograma de implementación? ¿Qué pasa si falla algo en la semana 2?"</label>
+    <input type="text" id="e1c" placeholder="Cuadrante...">
+
+    <label>d) "Esto es igual a lo que ya tengo. ¿No hay algo que realmente cambie las reglas del juego?"</label>
+    <input type="text" id="e1d" placeholder="Cuadrante...">
+  </div>
+
+  <!-- EJERCICIO 2 -->
+  <div class="ejercicio">
+    <h4>Ejercicio 2 · Traduce tu mensaje</h4>
+    <p>Producto: <strong>Software de gestión de inventario</strong>. Beneficio central: "Reduce pérdidas de stock en un 25%".</p>
+
+    <label>🟦 Cliente A (Azul / Analítico):</label>
+    <textarea rows="2" id="e2a" placeholder="Tu mensaje..."></textarea>
+
+    <label>🟩 Cliente B (Verde / Organizado):</label>
+    <textarea rows="2" id="e2b" placeholder="Tu mensaje..."></textarea>
+
+    <label>🟥 Cliente C (Rojo / Relacional):</label>
+    <textarea rows="2" id="e2c" placeholder="Tu mensaje..."></textarea>
+
+    <label>🟨 Cliente D (Amarillo / Innovador):</label>
+    <textarea rows="2" id="e2d" placeholder="Tu mensaje..."></textarea>
+  </div>
+
+  <!-- EJERCICIO 3 -->
+  <div class="ejercicio">
+    <h4>Ejercicio 3 · Detecta el error del vendedor</h4>
+    <p>Lee la situación y describe qué error cometió el vendedor según la teoría de Herrmann:</p>
+    <div class="box rojo">
+      <em>Cliente (visiblemente emocional):</em> "Es que mi equipo está desmotivado, siento que necesito algo que los una..."<br><br>
+      <em>Vendedor:</em> "Entiendo. Mire, nuestro programa tiene 47 módulos, un ROI del 22% comprobado y..."<br><br>
+      <em>Cliente:</em> (silencio, pierde interés)
+    </div>
+    <textarea rows="3" id="e3" placeholder="Describe el error y cómo lo corregirías..."></textarea>
+  </div>
+
+  <!-- EJERCICIO 4 -->
+  <div class="ejercicio">
+    <h4>Ejercicio 4 · Adapta tu pitch</h4>
+    <p>Escenario: vendes un <strong>servicio de consultoría financiera</strong> a una gerente que, en la primera reunión, llega con una carpeta llena de gráficos y pregunta "¿cuál es el retorno exacto por cada peso invertido?".</p>
+    <p>¿Qué cuadrante domina? ¿Cómo adaptarías tu presentación?</p>
+    <textarea rows="4" id="e4" placeholder="Tu respuesta..."></textarea>
+  </div>
+
+  <button class="btn azul" onclick="guardarRespuestas()">💾 Guardar respuestas</button>
+  <button class="btn rojo" onclick="borrarRespuestas()">🗑 Reiniciar</button>
+</div>
+
+<!-- ============================================================ -->
+<!-- PANEL 3: RESPUESTAS                                          -->
+<!-- ============================================================ -->
+<div id="respuestas" class="panel">
+  <h2 style="color:var(--azul);border-bottom:3px solid var(--verde);padding-bottom:10px;margin-bottom:18px;">✅ Respuestas Esperadas</h2>
+
+  <div class="box verde">
+    Compara tus respuestas con estos modelos. No hay una única respuesta correcta en los ejercicios abiertos, pero sí criterios clave.
+  </div>
+
+  <div class="respuesta">
+    <h4>Ejercicio 1 · Identificación de cuadrantes</h4>
+    <ul>
+      <li><strong>a) A (Azul)</strong> — Pide datos, comparativas, ROI. Lenguaje lógico-analítico.</li>
+      <li><strong>b) C (Rojo)</strong> — Valora el trato, la relación, la atención personal.</li>
+      <li><strong>c) B (Verde)</strong> — Pregunta por procesos, cronogramas, planes de contingencia.</li>
+      <li><strong>d) D (Amarillo)</strong> — Busca novedad, disrupción, visión diferente.</li>
+    </ul>
+  </div>
+
+  <div class="respuesta">
+    <h4>Ejercicio 2 · Traducción del mensaje (modelo)</h4>
+    <p><strong>Producto:</strong> "Reduce pérdidas de stock en un 25%"</p>
+    <ul>
+      <li><strong>A · Azul:</strong> "Según datos de 150 empresas, la reducción promedio de pérdidas fue del 25,3% en el primer año. Aquí está el estudio."</li>
+      <li><strong>B · Verde:</strong> "La implementación toma 3 semanas. Incluye manual, capacitación y soporte permanente. Si algo falla, hay un protocolo específico."</li>
+      <li><strong>C · Rojo:</strong> "Nuestros clientes nos dicen que por fin duermen tranquilos: ya no se preocupan por lo que falta en bodega."</li>
+      <li><strong>D · Amarillo:</strong> "Imagina que tu equipo deja de perseguir inventario y empieza a diseñar nuevas estrategias de crecimiento."</li>
+    </ul>
+  </div>
+
+  <div class="respuesta">
+    <h4>Ejercicio 3 · Detección del error</h4>
+    <p><strong>Error principal:</strong> El cliente claramente mostraba dominancia <strong>C (rojo / emocional)</strong> —habló de desmotivación, de "sentir" que necesitaba algo para unir al equipo. El vendedor respondió con datos y módulos (lenguaje <strong>A / azul</strong>). Hubo un choque de cuadrantes.</p>
+    <p><strong>Corrección:</strong> Antes de presentar datos, validar la emoción: "Entiendo perfectamente lo que sientes. Muchos líderes pasan por eso. Cuéntame más sobre cómo afecta eso al día a día de tu equipo." Luego, conectar la solución con el bienestar del equipo (C), y solo después introducir datos (A) si el cliente los pide.</p>
+  </div>
+
+  <div class="respuesta">
+    <h4>Ejercicio 4 · Adaptación del pitch</h4>
+    <p><strong>Cuadrante dominante:</strong> <strong>A (Azul / Analítico)</strong> —llega con gráficos y pregunta por retorno exacto por peso invertido.</p>
+    <p><strong>Cómo adaptar la presentación:</strong></p>
+    <ul>
+      <li>Abrir con el dato clave: "Por cada peso invertido, el retorno promedio es de X."</li>
+      <li>Traer comparativas y escenarios (mejor caso, caso base, peor caso).</li>
+      <li>Evitar historias emotivas o lenguaje de "sentir".</li>
+      <li>Dejar que ella conduzca el análisis: responder con precisión, sin adornos.</li>
+      <li>Ofrecer documentación técnica adicional para que pueda revisarla después.</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- PANEL 4: ENTREGABLE                                          -->
+<!-- ============================================================ -->
+<div id="entregable" class="panel">
+  <h2 style="color:var(--azul);border-bottom:3px solid var(--naranja);padding-bottom:10px;margin-bottom:18px;">📦 Entregable de la Clase</h2>
+
+  <div class="entregable">
+    <h3>🎯 Producto final: Mapa de clientes según Herrmann + Guion adaptado</h3>
+
+    <p><strong>Formato:</strong> Individual o en parejas | <strong>Tiempo:</strong> 12 minutos en clase + finalización en casa | <strong>Entrega:</strong> Documento PDF o presentación</p>
+
+    <h3>Instrucciones:</h3>
+    <ol style="padding-left:22px;line-height:1.8;">
+      <li>Elige un producto o servicio real (puede ser inventado).</li>
+      <li>Diseña el <strong>perfil de 4 clientes</strong> potenciales, uno por cada cuadrante (A, B, C, D). Describe: cargo, sector, comportamiento en la reunión y frase típica.</li>
+      <li>Para cada cliente, escribe un <strong>guion de apertura y presentación adaptado</strong> (mínimo 3 líneas por cliente).</li>
+      <li>Incluye un <strong>diagrama visual</strong> del cerebro total con las 4 estrategias de venta.</li>
+      <li>Agrega una <strong>reflexión final</strong> (5 líneas): ¿Cuál es tu propio cuadrante dominante y cómo podría afectar tu forma de vender?</li>
+    </ol>
+  </div>
+
+  <h3>📋 Plantilla de entrega</h3>
+
+  <table>
+    <tr><th>Sección</th><th>Descripción</th><th>Puntos</th></tr>
+    <tr><td>1. Producto elegido</td><td>Nombre, sector, propuesta de valor</td><td>10</td></tr>
+    <tr><td>2. Perfil de 4 clientes</td><td>Uno por cuadrante, con frases típicas</td><td>25</td></tr>
+    <tr><td>3. Guion adaptado</td><td>3 líneas por cliente, lenguaje del cuadrante</td><td>30</td></tr>
+    <tr><td>4. Diagrama del cerebro total</td><td>Visual con las 4 estrategias</td><td>15</td></tr>
+    <tr><td>5. Reflexión final</td><td>5 líneas sobre tu propio cuadrante</td><td>10</td></tr>
+    <tr><td>6. Presentación visual</td><td>Formato limpio, claro, profesional</td><td>10</td></tr>
+    <tr><td colspan="2" style="text-align:right;"><strong>Total</strong></td><td><strong>100</strong></td></tr>
+  </table>
+
+  <div class="box verde">
+    <strong>Criterio de evaluación:</strong> No se evalúa la "creatividad" del producto, sino la <em>coherencia</em> entre el cuadrante identificado, la frase típica del cliente y el guion adaptado. Si el guion podría servir para cualquier cliente, está mal.
+  </div>
+
+  <div class="box naranja">
+    <strong>Consejo:</strong> Usa frases reales que hayas escuchado de clientes. Mientras más específicas, mejor se evaluará tu identificación del cuadrante.
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- PANEL 5: RECURSOS                                            -->
+<!-- ============================================================ -->
+<div id="recursos" class="panel">
+  <h2 style="color:var(--azul);border-bottom:3px solid var(--azul-claro);padding-bottom:10px;margin-bottom:18px;">📚 Recursos y Referencias</h2>
+
+  <h3>Referencias académicas (APA 7)</h3>
+  <ul style="line-height:2;padding-left:22px;font-size:.92rem;">
+    <li>Herrmann, N. (1996). <em>The whole brain business book</em>. McGraw-Hill.</li>
+    <li>Herrmann, N. (2002). <em>El cerebro creativo</em>. Ned Herrmann Group.</li>
+    <li>Herrmann, N. (2003). <em>The creative brain</em>. Brain Books.</li>
+    <li>Herrmann International. (2015). <em>Case studies: Purdue Pharma</em> [White paper]. <a href="https://www.herrmann.com.sg/" target="_blank" rel="noopener">https://www.herrmann.com.sg/</a></li>
+    <li>Herrmann International. (2019). <em>Using Whole Brain® Thinking to communicate with your customers</em>. <a href="https://herrmann.com.sg/" target="_blank" rel="noopener">https://herrmann.com.sg/</a></li>
+    <li>Herrmann International. (2020). <em>Frequently asked questions</em>. <a href="https://herrmann.com.sg/faq/" target="_blank" rel="noopener">https://herrmann.com.sg/faq/</a></li>
+    <li>Herrmann International. (2023). <em>The four thinking quadrants explained, and how to communicate with them</em>. <a href="https://herrmann.co.nz/" target="_blank" rel="noopener">https://herrmann.co.nz/</a></li>
+    <li>Huhn, C. (s.f.). Blau, Grün, Rot, Gelb: Welche Sprache spricht Ihr Gegenüber? <em>ZWP Online</em>.</li>
+    <li>Puentes, A. (2009). <em>Modelo de cerebro total de Ned Herrmann</em>. [Citado en artículo académico].</li>
+    <li>Sayago, Z., &amp; Lemos, M. (2008). <em>Dominancia cerebral y aprendizaje</em>. Universidad Nacional del Centro del Perú.</li>
+  </ul>
+
+  <h3>Recursos complementarios</h3>
+  <ul style="line-height:1.9;padding-left:22px;font-size:.92rem;">
+    <li>📖 Herrmann, N. (1996). <em>The Whole Brain Business Book</em> — lectura central para profundizar.</li>
+    <li>🎥 Videos explicativos del modelo Herrmann en YouTube (buscar "Herrmann Whole Brain Thinking").</li>
+    <li>📝 Test HBDI (Herrmann Brain Dominance Instrument) — instrumento oficial para identificar tu propio cuadrante dominante.</li>
+    <li>📊 Artículos de Herrmann International sobre ventas y comunicación con clientes.</li>
+  </ul>
+
+  <div class="box">
+    <strong>Nota para el docente:</strong> El HBDI es la herramienta oficial de evaluación de Herrmann. Se recomienda mencionarla como recurso opcional para que los estudiantes identifiquen su propio perfil.
+  </div>
+</div>
+
+<div id="toast" class="toast">✅ Respuestas guardadas</div>
+
+<footer>
+  Clase interactiva · Teoría de Ned Herrmann aplicada a Ventas · 60 minutos · Elaborado con fines educativos
+</footer>
+
+<script>
+  /* ---------- CAMBIO DE PESTAÑA ---------- */
+  function cambiarTab(id, btn){
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    btn.classList.add('active');
+    btn.classList.add('visitada');
+    // Si volvemos a diapositivas, reactivar botones correctos
+    if(id === 'diapositivas'){ mostrarSlide(slideActual); }
+  }
+
+  /* ---------- DIAPOSITIVAS ---------- */
+  let slideActual = 0;
+  const slides = document.querySelectorAll('.slide');
+  const totalSlides = slides.length;
+
+  function mostrarSlide(n){
+    slides.forEach(s => s.classList.remove('active'));
+    slides[n].classList.add('active');
+    document.getElementById('contador').textContent = (n+1) + ' / ' + totalSlides;
+
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+
+    // Botón anterior
+    prevBtn.disabled = (n === 0);
+
+    // Botón siguiente: si es el último, se convierte en CTA hacia ejercicios
+    if(n === totalSlides - 1){
+      nextBtn.textContent = "🎓 Ir a ejercicios";
+      nextBtn.classList.add('cta');
+      nextBtn.disabled = false;
+      nextBtn.onclick = function(){
+        const btnEj = document.querySelector('.tab-btn:nth-child(2)');
+        cambiarTab('ejercicios', btnEj);
+      };
+    } else {
+      nextBtn.textContent = "Siguiente →";
+      nextBtn.classList.remove('cta');
+      nextBtn.disabled = false;
+      nextBtn.onclick = function(){ moverSlide(1); };
+    }
+  }
+
+  function moverSlide(dir){
+    slideActual += dir;
+    if(slideActual < 0) slideActual = 0;
+    if(slideActual >= totalSlides) slideActual = totalSlides - 1;
+    mostrarSlide(slideActual);
+  }
+
+  /* ---------- NAVEGACIÓN CON TECLADO ---------- */
+  document.addEventListener('keydown', function(e){
+    const panelActivo = document.querySelector('.panel.active');
+    if(!panelActivo || panelActivo.id !== 'diapositivas') return;
+    if(e.key === 'ArrowRight'){ moverSlide(1); }
+    if(e.key === 'ArrowLeft'){ moverSlide(-1); }
+  });
+
+  /* ---------- GUARDAR / BORRAR RESPUESTAS ---------- */
+  const CAMPOS = ['e1a','e1b','e1c','e1d','e2a','e2b','e2c','e2d','e3','e4'];
+
+  function guardarRespuestas(){
+    const datos = {};
+    CAMPOS.forEach(id => {
+      const el = document.getElementById(id);
+      if(el) datos[id] = el.value;
+    });
+    try{
+      localStorage.setItem('herrmann_ventas_respuestas', JSON.stringify(datos));
+      mostrarToast('✅ Respuestas guardadas en este navegador');
+    }catch(err){
+      mostrarToast('⚠ No se pudo guardar (almacenamiento bloqueado)');
+    }
+  }
+
+  function borrarRespuestas(){
+    if(!confirm('¿Borrar todas tus respuestas guardadas?')) return;
+    CAMPOS.forEach(id => {
+      const el = document.getElementById(id);
+      if(el) el.value = '';
+    });
+    localStorage.removeItem('herrmann_ventas_respuestas');
+    mostrarToast('🗑 Respuestas borradas');
+  }
+
+  function cargarRespuestas(){
+    try{
+      const guardadas = JSON.parse(localStorage.getItem('herrmann_ventas_respuestas') || '{}');
+      CAMPOS.forEach(id => {
+        const el = document.getElementById(id);
+        if(el && guardadas[id] !== undefined) el.value = guardadas[id];
+      });
+    }catch(err){ /* silencioso */ }
+  }
+
+  function mostrarToast(msg){
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('visible');
+    clearTimeout(t._timer);
+    t._timer = setTimeout(() => t.classList.remove('visible'), 2200);
+  }
+
+  /* ---------- INICIALIZAR ---------- */
+  mostrarSlide(0);
+  cargarRespuestas();
+</script>
+</body>
+</html>
